@@ -90,6 +90,12 @@
     &.new {
       color: @grayLight;
     }
+    &.today,
+    &.today:hover {
+      .buttonBackground(@btnWarningBackground, spin(@btnWarningBackground, 20));
+      color: #fff;
+      text-shadow: 1px 1px 0 rgba(0,0,0,.25);
+    }
     &.active,
     &.active:hover {
       .buttonBackground(@btnPrimaryBackground, spin(@btnPrimaryBackground, 20));

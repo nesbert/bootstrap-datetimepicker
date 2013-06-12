@@ -49,14 +49,18 @@
         throw new Error('Must choose at least one picker');
       this.options = options;
       this.$element = $(element);
+      this.$input = this.$element;
       this.language = options.language in dates ? options.language : 'en'
       this.pickDate = options.pickDate;
       this.pickTime = options.pickTime;
       this.isInput = this.$element.is('input');
       this.component = false;
       this.componentSelector = options.componentSelector;
-      if (this.$element.find('.input-append') || this.$element.find('.input-prepend'))
-          this.component = this.$element.find(this.componentSelector);
+
+      if (this.$element.is('.input-append') || this.$element.is('.input-prepend')) {
+        this.component = this.$element.find(this.componentSelector);
+        this.$input = this.$element.find('input');
+      }
       this.format = options.format;
       if (!this.format) {
         if (this.isInput) this.format = this.$element.data('format');
@@ -70,13 +74,15 @@
       if (this.pickTime) {
         if (icon && icon.length) this.timeIcon = icon.data('time-icon');
         if (!this.timeIcon) this.timeIcon = 'icon-time';
-        icon.addClass(this.timeIcon);
+        if (icon && icon.length) icon.addClass(this.timeIcon);
       }
       if (this.pickDate) {
         if (icon && icon.length) this.dateIcon = icon.data('date-icon');
         if (!this.dateIcon) this.dateIcon = 'icon-calendar';
-        icon.removeClass(this.timeIcon);
-        icon.addClass(this.dateIcon);
+        if (icon && icon.length) {
+          icon.removeClass(this.timeIcon);
+          icon.addClass(this.dateIcon);
+        }
       }
       this.widget = $(getTemplate(this.timeIcon, options.pickDate, options.pickTime, options.pick12HourFormat, options.pickSeconds, options.collapse)).appendTo('body');
       this.minViewMode = options.minViewMode||this.$element.data('date-minviewmode')||0;
@@ -157,7 +163,6 @@
       this.widget.hide();
       this.viewMode = this.startViewMode;
       this.showMode();
-      this.set();
       this.$element.trigger({
         type: 'hide',
         date: this._date
@@ -354,6 +359,7 @@
     },
 
     fillDate: function() {
+      var today = new Date();
       var year = this.viewDate.getUTCFullYear();
       var month = this.viewDate.getUTCMonth();
       var currentDate = UTCDate(
@@ -407,7 +413,14 @@
                     prevMonth.getUTCMonth() > month)) {
           clsName += ' new';
         }
-        if (prevMonth.valueOf() === currentDate.valueOf()) {
+
+        if (prevMonth.getUTCFullYear() == today.getFullYear() &&
+          prevMonth.getUTCMonth() == today.getMonth() &&
+          prevMonth.getUTCDate() == today.getDate()) {
+          clsName += ' today';
+        }
+
+        if (prevMonth.valueOf() === currentDate.valueOf() && this.$input.val()) {
           clsName += ' active';
         }
         if ((prevMonth.valueOf() + 86400000) <= this.startDate) {
@@ -598,6 +611,7 @@
               this.showMode(-1);
               this.fillDate();
               this.set();
+              this.$input.trigger('change');
               break;
             case 'td':
               if (target.is('.day')) {
@@ -628,10 +642,11 @@
                 );
                 this.viewDate = UTCDate(
                   year, month, Math.min(28, day) , 0, 0, 0, 0);
-                this.fillDate();
                 this.set();
+                this.fillDate();
                 this.notifyChange();
               }
+              this.$input.trigger('change');
               break;
           }
         }
@@ -730,6 +745,7 @@
       this.set();
       this.fillTime();
       this.notifyChange();
+      this.$input.trigger('change');
       return rv;
     },
 
@@ -808,6 +824,7 @@
         this.setValue(this._date.getTime());
         if (this._date) this.set();
         else input.val('');
+        this.$input.trigger('change');
       } else {
         if (this._date) {
           this.setValue(null);
@@ -834,7 +851,9 @@
       this._detachDatePickerGlobalEvents();
       this.widget.remove();
       this.$element.removeData('datetimepicker');
-      this.component.removeData('datetimepicker');
+      if (this.component) {
+        this.component.removeData('datetimepicker');
+      }
     },
 
     formatDate: function(d) {
@@ -1009,10 +1028,8 @@
     _attachDatePickerGlobalEvents: function() {
       $(window).on(
         'resize.datetimepicker' + this.id, $.proxy(this.place, this));
-      if (!this.isInput) {
-        $(document).on(
-          'mousedown.datetimepicker' + this.id, $.proxy(this.hide, this));
-      }
+      $(document).on(
+        'mousedown.datetimepicker' + this.id, $.proxy(this.hide, this));
     },
 
     _detachDatePickerEvents: function() {
