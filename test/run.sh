@@ -2,13 +2,13 @@
 if [ ! -x ./node_modules/.bin/phantomjs ]; then
         case $OSTYPE in
                 darwin*)
-                        f=phantomjs-1.8.1-macosx.zip
+                        f=phantomjs-1.9.1-macosx.zip
                         d="${f%.zip}"
                         wget http://phantomjs.googlecode.com/files/$f
                         unzip $f
                         ;;
                 *)
-                        f=phantomjs-1.8.1-linux-i686.tar.bz2
+                        f=phantomjs-1.9.1-linux-i686.tar.bz2
                         d="${f%.tar.bz2}"
                         wget http://phantomjs.googlecode.com/files/$f
                         tar xf $f
@@ -24,11 +24,11 @@ if [ ! -r $jq ]; then
 fi
 bsjs=./test/bootstrap.js
 if [ ! -r $bsjs ]; then
-        wget http://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/js/bootstrap.min.js  -O $bsjs
+        wget http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js  -O $bsjs
 fi
 bscss=./test/bootstrap.css
 if [ ! -r $bscss ]; then
-        wget http://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/css/bootstrap-combined.min.css -O $bscss
+        wget http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css -O $bscss
 fi
 cd ./test
 cat utils.coffee specs.coffee issues.coffee | \

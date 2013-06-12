@@ -16,7 +16,7 @@
     "uglify-js": "*",
     "less": "*",
     "mocha-phantomjs": "*",
-    "mocha": "*",
+    "mocha": "~1.9.0",
     "chai": "*",
     "coffee-script": "*"
   }
